@@ -13,8 +13,8 @@ import (
 func main() {
 	nArgs := len(os.Args)
 	if nArgs < 2 || nArgs > 3 {
-		fmt.Printf("USAGE\n\tunrar <archive.rar> [./dst/]\n\n")
-		fmt.Printf("EXAMPLES\n\tunrar ./archive.rar\n\tunrar ./archive.rar ./unpacked/\n\n")
+		fmt.Printf("USAGE\n\trunzip <archive.rar> [./dst/]\n\n")
+		fmt.Printf("EXAMPLES\n\trunzip ./archive.rar\n\trunzip ./archive.rar ./unpacked/\n\n")
 		os.Exit(1)
 		return
 	}
@@ -56,7 +56,7 @@ func main() {
 
 	fmt.Fprintf(os.Stderr, "extracting to temporary path '%s/'...\n", tmpRel)
 
-	topLevelFiles, err := unrar(rarFile, tmpDir)
+	topLevelFiles, err := runzip(rarFile, tmpDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: could not unarchive: %v\n", err)
 		os.Exit(1)
@@ -74,7 +74,7 @@ func main() {
 	fmt.Fprintf(os.Stderr, "extracted to '%s/'\n", finalRel)
 }
 
-func unrar(rarFile, absRoot string) ([]string, error) {
+func runzip(rarFile, absRoot string) ([]string, error) {
 	var err error
 	topLevelFiles := []string{}
 
