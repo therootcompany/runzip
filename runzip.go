@@ -10,11 +10,47 @@ import (
 	"github.com/nwaples/rardecode"
 )
 
+var (
+	name = "runzip"
+	// these will be replaced by goreleaser
+	version = "0.0.0"
+	date    = "0001-01-01T00:00:00Z"
+	commit  = "0000000"
+)
+
+func printVersion() {
+	fmt.Printf("%s v%s %s (%s)\n", name, version, commit[:7], date)
+	fmt.Printf("Copyright (C) 2024 AJ ONeal\n")
+	fmt.Printf("Licensed under the BSD 2-clause license\n")
+}
+
+func printUsage() {
+	fmt.Printf("%s v%s %s (%s)\n", name, version, commit[:7], date)
+	fmt.Printf("\n")
+	fmt.Printf("USAGE\n\trunzip <archive.rar> [./dst/]\n\n")
+	fmt.Printf("EXAMPLES\n\trunzip ./archive.rar\n\trunzip ./archive.rar ./unpacked/\n\n")
+}
+
 func main() {
 	nArgs := len(os.Args)
+
+	if nArgs >= 2 {
+		opt := os.Args[1]
+		subcmd := strings.TrimPrefix(opt, "-")
+		if opt == "-V" || subcmd == "version" {
+			printVersion()
+			os.Exit(0)
+			return
+		}
+		if subcmd == "help" {
+			printUsage()
+			os.Exit(0)
+			return
+		}
+	}
+
 	if nArgs < 2 || nArgs > 3 {
-		fmt.Printf("USAGE\n\trunzip <archive.rar> [./dst/]\n\n")
-		fmt.Printf("EXAMPLES\n\trunzip ./archive.rar\n\trunzip ./archive.rar ./unpacked/\n\n")
+		printUsage()
 		os.Exit(1)
 		return
 	}
