@@ -11,12 +11,25 @@ import (
 )
 
 var (
-	name = "runzip"
-	// these will be replaced by goreleaser
-	version = "0.0.0"
-	date    = "0001-01-01T00:00:00Z"
-	commit  = "0000000"
+	name    = "runzip"
+	version string
+	date    string
+	commit  string
 )
+
+// workaround for `tinygo` ldflag replacement handling not allowing default values
+// See <https://github.com/tinygo-org/tinygo/issues/2976>
+func init() {
+	if len(version) == 0 {
+		version = "0.0.0-dev"
+	}
+	if len(date) == 0 {
+		date = "0001-01-01T00:00:00Z"
+	}
+	if len(commit) == 0 {
+		commit = "0000000"
+	}
+}
 
 func printVersion() {
 	fmt.Printf("%s v%s %s (%s)\n", name, version, commit[:7], date)
