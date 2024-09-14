@@ -1,4 +1,4 @@
-# runzip
+# [runzip](https://webinstall.dev/runzip)
 
 A command line utility for unpacking .rar files.
 
@@ -15,3 +15,39 @@ EXAMPLES
 For archives with a single file or folder, this will extract that to the given directory.
 
 For archives with multiple files or folders, it will create a directory of the same name as the archive.
+
+# Install
+
+## macOS, Linux, BSD, \*nix
+
+```sh
+curl -sS https://webi.sh/runzip | sh
+source ~/.config/envman/PATH.env
+```
+
+## Windows
+
+```sh
+curl.exe -sS https://webi.ms/runzip | powershell
+```
+
+## Go
+
+```sh
+go install github.com/therootcompany/runzip
+```
+
+## Manual
+
+Download the distributable version for your OS and Architecture from
+<https://github.com/therootcompany/runzip/releases>, unzip, and place in your
+`PATH`.
+
+```sh
+# note: tar works for unzip on Windows
+tar xvf runzip-*.*
+mv runzip ~/bin/
+```
+
+note: you can use [pathman](https://webinstall.dev/pathman) if you need a
+cross-platform, cross-shell PATH manager.
