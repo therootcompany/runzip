@@ -1,0 +1,18 @@
+#!/bin/sh
+# shellcheck disable=SC1090
+set -e
+set -u
+
+if ! command -v tinygo > /dev/null; then
+    curl -sS https://webi.sh/tinygo | sh
+    . ~/.config/envman/PATH.env
+fi
+
+b_version=$(git describe --tags --abbrev=0 2> /dev/null || echo "v0.0.0")
+b_version=$(echo "${b_version}" | sed 's/^v//')
+b_commit=$(git rev-parse --short HEAD)
+b_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+b_ldflags="-X 'main.version=${b_version}-dev' -X 'main.commit=${b_commit}' -X 'main.date=${b_date}'"
+echo "${b_ldflags}"
+tinygo build -ldflags="${b_ldflags}" -o runzip ./runzip.go
