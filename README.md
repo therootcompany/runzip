@@ -51,3 +51,39 @@ mv runzip ~/bin/
 
 note: you can use [pathman](https://webinstall.dev/pathman) if you need a
 cross-platform, cross-shell PATH manager.
+
+# Build
+
+## Go
+
+```sh
+./scripts/go-build
+```
+
+Or
+
+```sh
+curl -sS https://webi.sh/go | sh
+source ~/.config/envman/PATH.env
+```
+
+```sh
+go build -o ./runzip ./runzip.go
+```
+
+## TinyGo
+
+```sh
+./scripts/tinygo-build
+```
+
+Or
+
+```sh
+curl -sS https://webi.sh/tinygo | sh
+source ~/.config/envman/PATH.env
+```
+
+```sh
+tinygo build -o ./runzip ./runzip.go
+```
