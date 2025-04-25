@@ -4,12 +4,13 @@ A command line utility for unpacking .rar files.
 
 ```text
 USAGE
-	runzip <archive.rar> [./dst/]
+	runzip [options] <archive.rar> [./dst/]
 
 EXAMPLES
 	runzip ./archive.rar                 # ./inner-dir/
 	runzip ./archive.rar ./existing-dir/ # ./existing-dir/inner-dir/
 	runzip ./archive.rar ./new-dir/      # ./new-dir/
+	runzip -p 123123 ./archive.rar ./new-dir/      # with passphrase and dst dir 
 ```
 
 For archives with a single file or folder, this will extract that to the given directory.

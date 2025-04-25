@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -39,54 +40,62 @@ func printVersion() {
 
 func printUsage() {
 	fmt.Printf("%s v%s %s (%s)\n", name, version, commit[:7], date)
-	fmt.Printf("\n")
-	fmt.Printf("USAGE\n\trunzip <archive.rar> [./dst/]\n\n")
-	fmt.Printf("EXAMPLES\n\trunzip ./archive.rar\n\trunzip ./archive.rar ./unpacked/\n\n")
+	fmt.Printf("Usage: %s [options] <rarFile> [destDir]\n", os.Args[0])
+	fmt.Println("Options:")
+	fmt.Println("  -V, --version        Print version")
+	fmt.Println("  -p, --password       Password for the archive")
+	fmt.Println("  --help               Print usage")
+}
+
+var (
+	showVersion bool
+	showHelp    bool
+	password    string
+)
+
+func init() {
+	flag.BoolVar(&showVersion, "V", false, "Print version")
+	flag.BoolVar(&showVersion, "version", false, "Print version")
+	flag.BoolVar(&showHelp, "help", false, "Print usage")
+	flag.StringVar(&password, "p", "", "Password for the archive")
 }
 
 func main() {
-	nArgs := len(os.Args)
+	flag.Parse()
 
-	if nArgs >= 2 {
-		opt := os.Args[1]
-		subcmd := strings.TrimPrefix(opt, "-")
-		if opt == "-V" || subcmd == "version" {
-			printVersion()
-			os.Exit(0)
-			return
-		}
-		if subcmd == "help" {
-			printUsage()
-			os.Exit(0)
-			return
-		}
+	if showVersion {
+		printVersion()
+		os.Exit(0)
+	}
+	if showHelp {
+		printUsage()
+		os.Exit(0)
 	}
 
-	if nArgs < 2 || nArgs > 3 {
+	args := flag.Args()
+	nArgs := len(args)
+
+	if nArgs < 1 || nArgs > 2 {
 		printUsage()
 		os.Exit(1)
-		return
 	}
 
 	// note: we only need to know that Getwd works once
-	//       (otherwise something is wrong in the universe)
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "sanity fail: %v\n", err)
 		os.Exit(1)
-		return
 	}
 
 	useInnerName := false
-	rarFile := os.Args[1]
+	rarFile := args[0]
 	finalDir := "."
-	if nArgs > 2 {
-		finalDir = os.Args[2]
+	if nArgs > 1 {
+		finalDir = args[1]
 	}
 	finalDir, _ = filepath.Abs(finalDir)
 
-	// encapsulate
-	if _, err := os.Stat(finalDir); nil == err {
+	if _, err := os.Stat(finalDir); err == nil {
 		useInnerName = true
 		name := filepath.Base(rarFile)
 		ext := filepath.Ext(name)
@@ -100,30 +109,27 @@ func main() {
 	if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
 		fmt.Fprintf(os.Stderr, "error: could not create destination: %v\n", err)
 		os.Exit(1)
-		return
 	}
 
 	fmt.Fprintf(os.Stderr, "extracting to temporary path '%s/'...\n", tmpRel)
 
-	topLevelFiles, err := runzip(rarFile, tmpDir)
+	topLevelFiles, err := runzip(rarFile, tmpDir, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: could not unarchive: %v\n", err)
 		os.Exit(1)
-		return
 	}
 
 	finalDir, err = finalizeDestination(tmpDir, finalDir, topLevelFiles, useInnerName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: could not rename directory: %v\n", err)
 		os.Exit(1)
-		return
 	}
 
 	finalRel, _ := filepath.Rel(cwd, finalDir)
 	fmt.Fprintf(os.Stderr, "extracted to '%s/'\n", finalRel)
 }
 
-func runzip(rarFile, absRoot string) ([]string, error) {
+func runzip(rarFile, absRoot string, pass string) ([]string, error) {
 	var err error
 	topLevelFiles := []string{}
 
@@ -133,7 +139,7 @@ func runzip(rarFile, absRoot string) ([]string, error) {
 	}
 	defer f.Close()
 
-	r, err := rardecode.NewReader(f, "")
+	r, err := rardecode.NewReader(f, pass)
 	if err != nil {
 		return nil, err
 	}
